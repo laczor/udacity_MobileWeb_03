@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <link rel="stylesheet" src="//normalize-css.googlecode.com/svn/trunk/normalize.css" />
+  <link rel="stylesheet" href="css/styles.css" media="nope!" onload="this.media='all'">
+  <title>Restaurant Reviews</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="manifest" href="/manifest.json">
+    <!-- For Safari Support -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="PWAGram">
+    <link rel="apple-touch-icon" href="/src/images/icons/apple-icon-57x57.png" sizes="57x57">
+    <link rel="apple-touch-icon" href="/src/images/icons/apple-icon-60x60.png" sizes="60x60">
+    <link rel="apple-touch-icon" href="/src/images/icons/apple-icon-72x72.png" sizes="72x72">
+    <link rel="apple-touch-icon" href="/src/images/icons/apple-icon-76x76.png" sizes="76x76">
+    <link rel="apple-touch-icon" href="/src/images/icons/apple-icon-114x114.png" sizes="114x114">
+    <link rel="apple-touch-icon" href="/src/images/icons/apple-icon-120x120.png" sizes="120x120">
+    <link rel="apple-touch-icon" href="/src/images/icons/apple-icon-144x144.png" sizes="144x144">
+    <link rel="apple-touch-icon" href="/src/images/icons/apple-icon-152x152.png" sizes="152x152">
+    <link rel="apple-touch-icon" href="/src/images/icons/apple-icon-180x180.png" sizes="180x180">
+  
+    <!-- For Internet Explorer support -->
+    <meta name="msapplication-TileImage" content="/src/images/icons/app-icon-144x144.png">
+    <meta name="msapplication-TileColor" content="#fff">
+    <meta name="theme-color" content="#3f51b5">
+  
+</head>
+
+<body>
+  <header>
+    <nav>
+      <h1><a href="/">Restaurant Reviews</a></h1>
+    </nav>
+    <style>
+
+      nav {
+            width: 100%;
+            height: 80px;
+            background-color: #252831;
+            text-align:center;
+          }
+          nav h1 {
+            margin: auto;
+            padding-top: 20px;
+          }
+          nav h1 a {
+            color: #fff;
+            font-size: 14pt;
+            font-weight: 200;
+            letter-spacing: 10px;
+            text-transform: uppercase;
+          }
+      .pre_loading{
+        background-color: #3397DB;
+        padding: 15px;
+        height: 75vh;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .load-wrapp {
+                box-shadow: 0 4px 8px 0 rgba(0,0,0,.4);
+                display: flex;
+                height: 400px;
+                align-items: center;
+                margin: 0 10px 10px 0;
+                border-radius: 15px;
+                text-align: center;
+                flex-direction: column;
+                background-color: white;
+      }
+        .load-wrapp .loading .loading-text{
+          margin-top: 20px;
+          font-size: 20px;
+          font-weight: 700;
+          padding: 20px;
+          color: #777;
+        }  
+        .load-wrapp .loader .letter-holder{
+                      padding: 20px 25px;
+        }
+        .letter-holder .letter {
+                          float: left;
+                          font-size: 20px;
+                          font-weight: 700;
+                          color: #777;
+                          animation-name: loading;
+                          animation-duration: 1.6s;
+                          animation-iteration-count: infinite;
+                          animation-direction: linear;
+        }
+        .letter-holder .letter.l-1 {animation-delay: .48s;}
+        .letter-holder .letter.l-2 {animation-delay: .6s;}
+        .letter-holder .letter.l-3 {animation-delay: .72s;}
+        .letter-holder .letter.l-4 {animation-delay: .84s;}
+        .letter-holder .letter.l-5 {animation-delay: .96s;}
+        .letter-holder .letter.l-6 {animation-delay: 1.08s;}
+        .letter-holder .letter.l-7 {animation-delay: 1.2s;}
+        .letter-holder .letter.l-8 {animation-delay: 1.32s;}
+        .letter-holder .letter.l-9 {animation-delay: 1.44s;}
+        .letter-holder .letter.l-10 {animation-delay: 1.56s;}         
+        @keyframes loading {
+            0% {opacity: 0;}
+            100% {opacity: 1;}
+        }
+
+        #footer {
+          background-color: #252831;
+          color: #aaa;
+          font-size: 8pt;
+          letter-spacing: 1px;
+          padding: 25px;
+          text-align: center;
+          text-transform: uppercase;
+        }
+        #footer a{
+          color: #3397db;
+          text-decoration: none;
+        }
+        @media screen and (max-width: 415px) {
+          nav{
+            height: initial;
+          }
+          nav h1{
+            padding-bottom: 15px;
+          }
+        }
+    </style>
+  </header> 
+  
+  <div  id="loader-div" class="pre_loading">
+    <div class="load-wrapp"  >
+
+      <div class="loading">
+          <div class="loading-text">Only the best restaurants for you</div>
+          <div class="loading-img">
+            <img src="/img/splash-logo.png" alt="Cooking master logo until page is loaded">
+          </div>
+      </div>
+
+      <div class="loader" >
+        <div class="letter-holder">
+          <div class="l-1 letter">L</div>
+          <div class="l-2 letter">o</div>
+          <div class="l-3 letter">a</div>
+          <div class="l-4 letter">d</div>
+          <div class="l-5 letter">i</div>
+          <div class="l-6 letter">n</div>
+          <div class="l-7 letter">g</div>
+          <div class="l-8 letter">.</div>
+          <div class="l-9 letter">.</div>
+          <div class="l-10 letter">.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main id="maincontent">
+    <a class="skip-link" href="#options">Skip map and go to options</a>
+    
+    <section id="map-container">
+      <div role="application"  aria-hidden="true" id="map" title="google-map"></div>
+    </section>
+
+    <section id="restaurants-section">
+      <div class="filter-options">
+
+        <h2>Filter Results</h2>
+        <button id="map-toggle" >Show map</button>            
+          
+        <div id="options"class="filter-selections">
+
+          <select  aria-label="neighborhoods select options" id="neighborhoods-select" name="neighborhoods" onchange="updateRestaurants()">
+            <option value="all">All Neighborhoods</option>
+          </select>
+  
+          <select  aria-label="cuisine select options" id="cuisines-select" name="cuisines" onchange="updateRestaurants()">
+            <option value="all">All Cuisines</option>
+          </select>
+
+        </div>
+
+      </div>
+      <ul id="restaurants-list"></ul>
+    </section>
+  </main>
+<!-- Polyfills for promise + fetch -->
+  <script  type="application/javascript" charset="utf-8" src="js/bundle.js"></script>
+
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAeiSkrfeMKo_xB4DtZce5BQde93j5yq_g&libraries=places&callback=initMap"></script>
+
+  <footer id="footer">
+    Copyright (c) 2017 <a href="/"><strong>Restaurant Reviews</strong></a> All Rights Reserved.
+  </footer>
+
+</body>
+
+</html>
