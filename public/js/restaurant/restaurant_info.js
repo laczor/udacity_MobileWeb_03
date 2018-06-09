@@ -4,23 +4,23 @@ var map;
 window.onload = function () {}
   
   
-  window.initMap = function ()  {
-    fetchRestaurantFromURL((error, restaurant) => {
-      if (error) { // Got an error!
-        console.error(error);
-      } else {
-        self.map = new google.maps.Map(document.getElementById('map'), {
-          zoom: 16,
-          center: restaurant.latlng,
-          scrollwheel: false
-        });
-        fillBreadcrumb();
-        DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
-        
-        // const iframe = document.querySelector('iframe'); iframe.title = "Google Maps"; 
-      }
-    });
-  };
+window.initMap = function ()  {
+  fetchRestaurantFromURL((error, restaurant) => {
+    if (error) { // Got an error!
+      console.error(error);
+    } else {
+      self.map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 16,
+        center: restaurant.latlng,
+        scrollwheel: false
+      });
+      fillBreadcrumb();
+      DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
+      
+      // const iframe = document.querySelector('iframe'); iframe.title = "Google Maps"; 
+    }
+  });
+};
 
 
 /**
@@ -179,3 +179,4 @@ function getParameterByName (name, url) {
     return '';
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
 }
+
