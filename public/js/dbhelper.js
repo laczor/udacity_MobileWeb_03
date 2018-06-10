@@ -22,7 +22,7 @@ class DBHelper {
     //These are the settings to fetch the data from the server
 
     const port = 1337 // Change this to your server port
-    return `http://localhost:${port}/restaurants`;
+    return `http://localhost:${port}`;
 
     //These are the setting to fetch from the restaurant.json, server by express
 
@@ -35,7 +35,7 @@ class DBHelper {
    * Fetch all restaurants form network first than cache.
    */
   static fetchRestaurants(callback) {
-    fetch(DBHelper.DATABASE_URL)
+    fetch(DBHelper.DATABASE_URL+'/restaurants')
     .then(function(response) {
       return response.json();
     })
@@ -68,11 +68,67 @@ class DBHelper {
   }
 
 
+  static fetchReviews(){
+
+    fetch(DBHelper.DATABASE_URL+'/reviews/')
+    .then(function(response) {
+      return response.json();
+    })
+    .then(function(reviews) {
+      //Storing objects recieved in the response seperately in the indexedDb
+        dbPromise.then(function(db) {
+              var tx = db.transaction('reviews', 'readwrite');
+              var reviewsStore = tx.objectStore('reviews');
+
+              reviews.map(function(el){
+                reviewsStore.put(el);
+              })
+
+              return tx.complete;
+        })
+        callback(null,reviews);
+
+    }).catch(function(error) {
+      //Fetching data from indexedDB if there is no connection
+        dbPromise.then(function(db) {
+            var tx = db.transaction('reviews', 'readwrite');
+            var reviewsStore = tx.objectStore('reviews');
+
+            reviewsStore.getAll().then(function(data){
+                callback(null,data);
+            })
+
+      });
+    });  
+  }
+
+  static fetchReviewsByRestaurantId(id){
+    console.log('fetching for ', id);
+    let url = DBHelper.DATABASE_URL+'/reviews/?restaurant_id='+id;
+    
+    fetch(url)
+    .then(function(response) {
+      console.log('this is the response',response);
+      return response.json();
+    })
+    // .then(function(reviews) {
+
+    //     console.log('Fetched reviews for id '+ id,'with the data of ',reviews);
+    //     return reviews;
+
+    // }).catch(function(error) {
+
+    //     console.log('error happened', error);
+    //     // This is where we should loop through the stored reviews in the indexedDB.
+
+    // });  
+  }
+
   /**
    * Fetch a restaurant by its ID.
    */
   static fetchRestaurantById(id, callback) {
-    fetch(DBHelper.DATABASE_URL+'/'+id)
+    fetch(DBHelper.DATABASE_URL+'/restaurants/'+id)
     .then(function(response) {
         return response.json();
     })
@@ -193,6 +249,9 @@ class DBHelper {
     return (`./restaurants?id=${restaurant.id}`);
   }
 
+  /**
+   * Restaurant image URL.
+   */
   /**
    * Restaurant image URL.
    */

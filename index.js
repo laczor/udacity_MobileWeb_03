@@ -5,8 +5,7 @@ var app     = express();
 // To tell express what should be the routefile for the files
 app.use(express.static(('dist')));
 
-
-app.get('/restaurants',function(req,res){
+app.get('/restaurants?id=',function(req,res){
   res.sendFile('restaurant.html',{ root: __dirname + '/dist/' });
   //It will find and locate index.html from View or Scripts
 });

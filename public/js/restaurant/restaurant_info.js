@@ -76,7 +76,7 @@ function fillRestaurantHTML (restaurant = self.restaurant) {
     fillRestaurantHoursHTML();
   }
   // fill reviews
-  fillReviewsHTML();
+  fetchRestaurantReviews();
 }
 
 /**
@@ -99,10 +99,25 @@ function fillRestaurantHoursHTML (operatingHours = self.restaurant.operating_hou
   }
 }
 
+
+function fetchRestaurantReviews(){
+
+  const id = getParameterByName('id'); 
+
+  let reviews = DBHelper.fetchReviewsByRestaurantId(id,(error, reviews) => {
+    if(error){
+      console.log('there has been an error',error);
+    }else{
+      fillReviewsHTML(reviews);
+    }
+  });
+}
 /**
  * Create all reviews HTML and add them to the webpage.
  */
-function fillReviewsHTML(reviews = self.restaurant.reviews) {
+function fillReviewsHTML(reviews) {
+
+  console.log('filling up the revievews html ',reviews);
   const container = document.getElementById('reviews-container');
   const title = document.createElement('h3');
   title.innerHTML = 'Reviews';
@@ -121,6 +136,7 @@ function fillReviewsHTML(reviews = self.restaurant.reviews) {
   container.appendChild(ul);
 }
 
+
 /**
  * Create review HTML and add it to the webpage.
  */
@@ -134,8 +150,10 @@ function createReviewHTML (review){
   header.appendChild(name);
 
   const date = document.createElement('p');
-  date.className="review-date";
-  date.innerHTML = review.date;
+  date.className="review-date"; 
+  let reviewDate = new Date (review.updatedAt);
+  date.innerHTML = reviewDate.getDay() + ' / ' + reviewDate.getMonth() + ' / ' +  reviewDate.getFullYear();
+  // date.innerHTML = reviewDate;
   header.appendChild(date);
 
   li.appendChild(header);
