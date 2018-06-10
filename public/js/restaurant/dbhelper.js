@@ -6,6 +6,9 @@ var dbPromise = window.idb.open('restaurant-db', 1, function (db) {
   if (!db.objectStoreNames.contains('restaurants')) {
     db.createObjectStore('restaurants',{keyPath: 'id'});
   }
+  if (!db.objectStoreNames.contains('reviews')) {
+    db.createObjectStore('reviews',{keyPath: 'id'});
+  }
 });
 
 
@@ -68,7 +71,7 @@ class DBHelper {
   }
 
 
-  static fetchReviews(){
+  static fetchRestaurantReviews(){
 
     fetch(DBHelper.DATABASE_URL+'/reviews/')
     .then(function(response) {
@@ -86,19 +89,19 @@ class DBHelper {
 
               return tx.complete;
         })
-        callback(null,reviews);
+        // callback(null,reviews);
 
     }).catch(function(error) {
       //Fetching data from indexedDB if there is no connection
-        dbPromise.then(function(db) {
-            var tx = db.transaction('reviews', 'readwrite');
-            var reviewsStore = tx.objectStore('reviews');
+      //   dbPromise.then(function(db) {
+      //       var tx = db.transaction('reviews', 'readwrite');
+      //       var reviewsStore = tx.objectStore('reviews');
 
-            reviewsStore.getAll().then(function(data){
-                callback(null,data);
-            })
+      //       reviewsStore.getAll().then(function(data){
+      //           callback(null,data);
+      //       })
 
-      });
+      // });
     });  
   }
 
@@ -110,13 +113,16 @@ class DBHelper {
     .then(function(response) {
       console.log('this is the response',response);
       return response.json();
-    })
-    .then(function(reviews) {
-        callback(null,reviews)
-    })
-    .catch(function(error) {
-      callback(error,undefined);
-    })
+
+    }).then(function(reviews) {
+
+        callback(null,reviews);
+
+    }).catch(function(){
+
+        callback(null,undefined);
+    });
+
   }
 
   /**

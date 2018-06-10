@@ -35,6 +35,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
       toggleMapView();
   })
 
+  fetchRestaurantReviews();
+
 });
 
 /**
@@ -109,6 +111,9 @@ function fetchCuisines () {
       fillCuisinesHTML();
     }
   });
+}
+function fetchRestaurantReviews () {
+  DBHelper.fetchRestaurantReviews();
 }
 
  /**
