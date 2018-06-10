@@ -107,6 +107,9 @@ function fetchRestaurantReviews(){
   let reviews = DBHelper.fetchReviewsByRestaurantId(id,(error, reviews) => {
     if(error){
       console.log('there has been an error',error);
+      DBHelper.fetchReviewsByRestaurantIdFromIDB(id,function (reviews) {
+        fillReviewsHTML(reviews);
+      });
     }else{
       fillReviewsHTML(reviews);
     }

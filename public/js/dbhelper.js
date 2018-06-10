@@ -118,9 +118,27 @@ class DBHelper {
 
         callback(null,reviews);
 
-    }).catch(function(){
+    }).catch(function(error){
 
-        callback(null,undefined);
+        callback(error,undefined);
+    });
+
+  }
+
+  static fetchReviewsByRestaurantIdFromIDB(id,callback){
+
+    dbPromise.then(function(db) {
+
+      var tx = db.transaction('reviews', 'readwrite');
+      var reviewsStore = tx.objectStore('reviews');
+  //Get the object from the OjbectStore by it's id, it is important that the id keypath is a type of number, so we should search number types
+        reviewsStore.getAll().then(function(data){
+          let restaurantReviews = data.filter(function(review) {
+              return review.restaurant_id = id;
+          })
+          callback(null,restaurantReviews);
+      })
+
     });
 
   }
