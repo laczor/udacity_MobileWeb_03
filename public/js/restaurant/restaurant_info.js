@@ -2,7 +2,16 @@ let restaurant;
 var map;
 
 window.onload = function () {}
-  
+
+let SAMPLE_REVIEW = {
+      comments:  "Five star food, two star atmosphere. I would definitely get takeout from this place - but dont think I have the energy to deal with the hipster ridiculousness again. By the time we left the wait was two hours long.",
+      createdAt: 1504095567183,
+      id:4,
+      name:"Steph",
+      rating:4,
+      restaurant_id:2,
+      updatedAt:1504095567183,
+};
   
 window.initMap = function ()  {
   fetchRestaurantFromURL((error, restaurant) => {
@@ -124,6 +133,7 @@ function fillReviewsHTML(reviews) {
   const container = document.getElementById('reviews-container');
   const title = document.createElement('h3');
   title.innerHTML = 'Reviews';
+
   container.appendChild(title);
 
   if (!reviews) {
@@ -137,9 +147,72 @@ function fillReviewsHTML(reviews) {
     ul.appendChild(createReviewHTML(review));
   });
   container.appendChild(ul);
+
+  const formDiv = document.createElement('div');
+  formDiv.id = 'review-add';
+
+  const link = document.createElement('a');
+  link.innerHTML = 'Add a Review';
+  const button = document.createElement('button');
+  button.id = 'addReview';
+  button.appendChild(link);
+  button.addEventListener('click',function() {
+    // button.style.display = none;
+    console.log('clicked');
+  })
+
+  let formDivision = document.createElement('div');
+  formDivision.className ="addReviewFormContainer"
+  formDivision.innerHTML = createForm();
+  formDiv.appendChild(button);
+  formDiv.appendChild(formDivision);
+
+  container.appendChild(formDiv);
+
 }
 
 
+function createForm() {
+
+    let formHTML =`  <form>
+
+    <div id="add-review-container">
+  
+      <div class="header">
+        <input  type="text" name="name" placeholder='Your Name' id="reviewerName">
+        <span id="add-review-close"> X </span>
+      </div>
+  
+      <div class="body">
+      <div class="rating-div">
+        <label for="rating">Rating :</label>
+        <select name="rating" id="reviewerRating">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+        </select>
+      </div>
+        <textarea name="comments"  placeholder='Write a review' id="reviewerComments" cols="30" rows="10" maxlength="150"></textarea>
+      </div>
+      
+      <button id="formSubmittion">Submit Review</button>
+  
+    </div>
+  
+  </form>`
+
+  return formHTML;
+
+
+  // document.getElementById('addReview').style.display = none;
+
+  // let formDiv = document.getElementById('review-add');
+
+  // formDiv.appendChild(createReviewHTML(SAMPLE_REVIEW));
+  
+}
 /**
  * Create review HTML and add it to the webpage.
  */
