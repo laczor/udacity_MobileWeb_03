@@ -129,7 +129,6 @@ function fetchRestaurantReviews(){
  */
 function fillReviewsHTML(reviews) {
 
-  console.log('filling up the revievews html ',reviews);
   const container = document.getElementById('reviews-container');
   const title = document.createElement('h3');
   title.innerHTML = 'Reviews';
@@ -148,6 +147,7 @@ function fillReviewsHTML(reviews) {
   });
   container.appendChild(ul);
 
+  //Creating add Review button + the Submittion from in JS
   const formDiv = document.createElement('div');
   formDiv.id = 'review-add';
 
@@ -161,28 +161,36 @@ function fillReviewsHTML(reviews) {
   formDivision.className ="addReviewFormContainer"
   formDivision.innerHTML = createForm();
   formDivision.style.display = "none";
-  // formDivision.style.transition = 'display 1s linear';
   formDiv.appendChild(button);
   formDiv.appendChild(formDivision);
   
   container.appendChild(formDiv);
   
+  let addReviewClose = document.getElementById('add-review-close');
+  let submitReviewButton = document.getElementById('formSubmission');
 
+  //Add event listeners, to hide/show form,button.
   button.addEventListener('click',function() {
     this.style.display = 'none'
     formDivision.style.display = 'flex';
   });
   
-  let addReviewClose = document.getElementById('add-review-close');
-  
   addReviewClose.addEventListener('click',function() {
     button.style.display = 'initial'
     formDivision.style.display = 'none';
   });
+
+  submitReviewButton.addEventListener('click',function (e) {
+    console.log('submitting review');
+    e.preventDefault();
+    this.validateReviewForm();
+  }.bind(window));
   
 }
 
-
+/**
+ * Create the submission html
+ */
 function createForm() {
 
     let formHTML =`  <form>
@@ -190,7 +198,7 @@ function createForm() {
     <div id="add-review-container">
   
       <div class="header">
-        <input  type="text" name="name" placeholder='Your Name' id="reviewerName">
+        <input  type="text" name="name"  value='' placeholder='Your Name' id="reviewerName">
         <span id="add-review-close"> X </span>
       </div>
   
@@ -207,8 +215,10 @@ function createForm() {
       </div>
         <textarea name="comments"  placeholder='Write a review' id="reviewerComments" cols="30" rows="10" maxlength="150"></textarea>
       </div>
+      <div id='formErrors'></div>
       
-      <button id="formSubmittion">Submit Review</button>
+      <button id="formSubmission">Submit Review</button>
+
   
     </div>
   
@@ -216,12 +226,56 @@ function createForm() {
 
   return formHTML;
 
+}
 
-  // document.getElementById('addReview').style.display = none;
+/**
+ * Will check if all of the fields are correct.
+ */
+function validateReviewForm() {
 
-  // let formDiv = document.getElementById('review-add');
+  let errors = [];
+  let restaurantID = restaurant.id; 
 
-  // formDiv.appendChild(createReviewHTML(SAMPLE_REVIEW));
+  //DOM SELECTORS 
+  let formErrorsDiv = document.getElementById('formErrors');
+  let reviewName = document.getElementById('reviewerName');
+  let reviewRating = document.getElementById('reviewerRating');
+  let reviewComments = document.getElementById('reviewerComments');
+
+  if(!validName(reviewName.value)){
+      errors.push('Name length should be between 0 and 10 charachters');
+  }
+  if (!validComment(reviewComments.value)) {
+    errors.push('Comment cannot be empty');
+  }
+  formErrorsDiv.innerHTML='';
+
+  for (let index = 0; index < errors.length; index++) {
+    const element = errors[index];
+    
+    let errorDiv = document.createElement('div');
+    errorDiv.className = 'error';
+    errorDiv.innerText = element;
+
+    formErrorsDiv.appendChild(errorDiv);
+    
+  }
+}
+
+function validName(name) {
+
+  if(name == 'name' || name =='' || name ==null || name== undefined){
+    return false;
+  }
+  return true;
+  
+}
+function validComment(comments) {
+
+  if( comments =='' || comments ==null || comments== undefined){
+    return false;
+  }
+  return true;
   
 }
 /**
