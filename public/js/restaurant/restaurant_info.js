@@ -156,19 +156,30 @@ function fillReviewsHTML(reviews) {
   const button = document.createElement('button');
   button.id = 'addReview';
   button.appendChild(link);
-  button.addEventListener('click',function() {
-    // button.style.display = none;
-    console.log('clicked');
-  })
-
+  
   let formDivision = document.createElement('div');
   formDivision.className ="addReviewFormContainer"
   formDivision.innerHTML = createForm();
+  formDivision.style.display = "none";
+  // formDivision.style.transition = 'display 1s linear';
   formDiv.appendChild(button);
   formDiv.appendChild(formDivision);
-
+  
   container.appendChild(formDiv);
+  
 
+  button.addEventListener('click',function() {
+    this.style.display = 'none'
+    formDivision.style.display = 'flex';
+  });
+  
+  let addReviewClose = document.getElementById('add-review-close');
+  
+  addReviewClose.addEventListener('click',function() {
+    button.style.display = 'initial'
+    formDivision.style.display = 'none';
+  });
+  
 }
 
 
