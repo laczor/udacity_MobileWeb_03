@@ -352,11 +352,40 @@ function showPostResult(success,review) {
     createdDiv.innerHTML = 'Review has been successfully posted';
 
   }else{
+    createBackgroundSyncTaskForReview(reviewObj);
+    // DBHelper.storeReviewsForLaterSync(reviewObj);
     createdDiv.innerHTML = 'Review will be posted upon reconnection';
   }
   
   reviewAdd.appendChild(createdDiv);
 
+}
+function createBackgroundSyncTaskForReview(reviewObj){
+    //1.We can only use background sync only if there is a service manager a&& SyncManager
+    // if ('serviceWorker' in navigator && 'SyncManager' in window) {
+    if (navigator.serviceWorker && window.SyncManager) {
+
+      console.log('Syncmasmanager is working, registering task');
+      //2. Check if the service worker is installed and ready to work, will return a promise
+        navigator.serviceWorker.ready
+          .then(function(sw) {
+
+      //4.Store it in the indexedDB, returns a promise
+      DBHelper.storeReviewsForLaterSync(reviewObj)
+              .then(function() {
+      //5.Register syncronization task in the service worker that it can 
+                console.log('review storedm ready to register a task');
+                return sw.sync.register('sync-new-review');
+              })
+      //6. Adding some user feedback that we saved this data
+              .then(function() {
+                  console.log('registered task');
+              })
+              .catch(function(err) {
+                console.log(err);
+              });
+          });
+      }
 }
 /**
  * Create review HTML and add it to the webpage.

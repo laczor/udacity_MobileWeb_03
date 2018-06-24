@@ -9,6 +9,9 @@ var dbPromise = window.idb.open('restaurant-db', 1, function (db) {
   if (!db.objectStoreNames.contains('reviews')) {
     db.createObjectStore('reviews',{keyPath: 'id'});
   }
+  if (!db.objectStoreNames.contains('sync-reviews')) {
+    db.createObjectStore('sync-reviews',{keyPath: 'id'});
+  }
 });
 
 
@@ -141,7 +144,20 @@ class DBHelper {
       })
 
     });
+  }
 
+  static storeReviewsForLaterSync(review){
+
+    console.log('storing review for later sync');
+
+    return dbPromise.then(function(db) {
+
+      var tx = db.transaction('sync-reviews', 'readwrite');
+      var reviewsStore = tx.objectStore('sync-reviews');
+  //Get the object from the OjbectStore by it's id, it is important that the id keypath is a type of number, so we should search number types
+      reviewsStore.put(review)
+      return tx.complete;
+    })
   }
 
   /**

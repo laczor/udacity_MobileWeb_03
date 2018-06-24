@@ -1,3 +1,11 @@
+//THese scripts has to be in the root folder!!
+importScripts('idb.js');
+
+var SERVER_URL = 'http://localhost:1337';
+
+var dbPromise = idb.open('restaurant-db', 1, function (db) {
+});
+
 var staticCacheName = 'restaurant-app-v02';              //This is where all of the js, html files will be cached
 var contentImgsCache = 'restaurant-content-imgs';       //This is where all of the images will be saved
 
@@ -17,6 +25,7 @@ self.addEventListener('install', function(event) {
   );
   
 });
+
 
 
 // ** Clearing all of the other non relevant/outdated cache files 
@@ -75,6 +84,43 @@ self.addEventListener('fetch', function(event) {
 
 });
 
+
+//0.This will be triggered when connection is reestablished and synronization might be needed
+self.addEventListener('sync', function(event) {
+  console.log('[Service Worker] Background syncing', event);
+//1.To identify our sync task specificly
+  if (event.tag === 'sync-new-review') {
+    console.log('[Service Worker] Syncing new Posts');
+//3. Wait until the following scripts will end    
+    event.waitUntil(
+//4. Will fetch all of the stored data from the indexDB
+
+      readyReviewsToBeSynced('sync-reviews')
+        .then(function(data) {
+//5. We make a seperate Post requests to store all of the posts seperately on firebase.
+          for (var dt of data) {
+            fetch(SERVER_URL+'/reviews/', {
+              method: 'POST',
+              body: JSON.stringify(dt)
+            })
+  //6.Delete the sent post from indexDB, we do not have access to the DOM          
+              .then(function(res) {
+                console.log('Background snyc post worked',res);
+                deleteItemFromData(dt.id);
+              })
+//7.Catch any error during the fetch method
+              .catch(function(err) {
+                console.log('Error while sending data', err);
+              });
+          }
+
+        })
+    );
+  }
+});
+
+
+
 function servePhoto(request) {
   var storageUrl = request.url.replace(/-\d+px\.jpg$/, '');
   //1. Will try to load the images-cache
@@ -92,3 +138,29 @@ function servePhoto(request) {
     });
   });
 }
+
+function readyReviewsToBeSynced(params) {
+  return dbPromise.then(function(db) {
+        
+    var tx = db.transaction('sync-reviews', 'readwrite');
+    var syncReviewsStore = tx.objectStore('sync-reviews');
+  //Get the object from the OjbectStore by it's id, it is important that the id keypath is a type of number, so we should search number types
+    return syncReviewsStore.getAll();
+  
+  });
+}
+
+function deleteItemFromData(id) {
+  dbPromise
+    .then(function(db) {
+      var tx = db.transaction('sync-reviews', 'readwrite');
+      var store = tx.objectStore('sync-reviews');
+      store.delete(id);
+      return tx.complete;
+    })
+    .then(function() {
+      console.log('Item deleted!');
+    });
+}
+
+
