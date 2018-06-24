@@ -431,6 +431,7 @@ margin: 10px 20px;
   display: block;
   width: 80%;
   max-width: 200px;
+  outline: none;
 }
 #reviewerName:active{
 border-bottom: 1px solid orange;
@@ -519,6 +520,17 @@ padding: 10px;
   color: #000;
   font-size: 15px;
   font-weight: 700;
+}
+#review-add .review-post-status{
+  margin: 10px;
+  background-color: rgb(36, 44, 48);
+  border-radius: 20px;
+  padding: 10px;
+  font-weight: 700;
+  font-size: 15px;
+  color: white;
+  text-align: center;
+
 }
 #formErrors .error{
   margin: 10px;

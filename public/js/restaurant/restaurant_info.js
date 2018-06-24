@@ -260,8 +260,15 @@ function validateReviewForm() {
     formErrorsDiv.appendChild(errorDiv);
     
   }
+
+  if(errors.length == 0){
+      postReview(createPostObject(restaurantID,reviewName.value,reviewRating.value,reviewComments.value),showPostResult);  
+  }
 }
 
+/**
+ * Will check if the recieved name variable is not empty
+ */
 function validName(name) {
 
   if(name == 'name' || name =='' || name ==null || name== undefined){
@@ -270,6 +277,9 @@ function validName(name) {
   return true;
   
 }
+/**
+ * Will check if the recieved comments variable is not empty
+ */
 function validComment(comments) {
 
   if( comments =='' || comments ==null || comments== undefined){
@@ -279,9 +289,79 @@ function validComment(comments) {
   
 }
 /**
+ * Will create a object for the POST request
+ */
+function createPostObject(id,name,rating,comments) {
+  
+  let obj = {
+    "restaurant_id": id,
+    "name":name,
+    "rating": rating,
+    "comments": comments
+  }
+  return obj;
+}
+/**
+ * Will create a POST request to the server, to add review to the restaurant + will execute a callback
+ */
+function postReview(data,callback) {
+
+    fetch(DBHelper.DATABASE_URL+'/reviews/', {
+      method: 'post',
+      body: JSON.stringify(data)
+    }).then(function(response) {
+      return response.json();
+    }).then(function(res) {
+      console.log('successful post',res);
+      callback(true,data);
+    }).catch(function(error) {
+      console.log('error has been occured',error);
+      callback(false,data);
+    });
+ 
+}
+
+function showPostResult(success,review) {
+  console.log('resuts',success);
+  let reviewForm = document.getElementById('add-review-container');
+  let reviewAdd = document.getElementById('review-add');
+
+  reviewForm.style.display = 'none';
+  let createdDiv = document.createElement('div');
+  createdDiv.className = 'review-post-status';
+
+  const ul = document.getElementById('reviews-list');
+
+  let reviewObj =  {
+    comments:  review.comments,
+    id:review.restaurant_id,
+    name:review.name,
+    rating:review.rating,
+    restaurant_id:restaurant.id,
+    updatedAt:Date.now(),
+  }
+
+  ul.appendChild(createReviewHTML(reviewObj));
+
+
+  if(success){
+
+    createdDiv.innerHTML = 'Review has been successfully posted';
+
+  }else{
+
+    createdDiv.innerHTML = 'Review will be posted upon reconnection';
+    
+  }
+  
+  reviewAdd.appendChild(createdDiv);
+
+}
+/**
  * Create review HTML and add it to the webpage.
  */
 function createReviewHTML (review){
+  console.log('creating review',review);
   const li = document.createElement('li');
   const header = document.createElement('div');
   header.className="review-header";
@@ -292,8 +372,9 @@ function createReviewHTML (review){
 
   const date = document.createElement('p');
   date.className="review-date"; 
-  let reviewDate = new Date (review.updatedAt);
-  date.innerHTML = reviewDate.getDay() + ' / ' + reviewDate.getMonth() + ' / ' +  reviewDate.getFullYear();
+  // let reviewDate = new Date (review.updatedAt);
+  // date.innerHTML = reviewDate.getDay() + ' / ' + reviewDate.getMonth() + ' / ' +  reviewDate.getFullYear();
+  date.innerHTML = createDateFormat(review.updatedAt);
   // date.innerHTML = reviewDate;
   header.appendChild(date);
 
@@ -310,6 +391,25 @@ function createReviewHTML (review){
   li.appendChild(comments);
 
   return li;
+}
+
+function createDateFormat(data) {
+
+  if (typeof data == 'number') {
+
+    let reviewDate = new Date (data);
+    return reviewDate.getDay() + ' / ' + reviewDate.getMonth() + ' / ' +  reviewDate.getFullYear();
+    
+  }else if(typeof data == 'string'){
+
+    let fullDate = data.split('T');
+    let date = fullDate[0];
+    let dateParts = date.split('-');
+
+    return dateParts[2] + ' / ' + parseInt(dateParts[1],10) + ' / ' +  parseInt(dateParts[0],10);
+
+  }
+  
 }
 
 /**
