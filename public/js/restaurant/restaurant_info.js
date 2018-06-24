@@ -115,8 +115,10 @@ function fetchRestaurantReviews(){
 
   let reviews = DBHelper.fetchReviewsByRestaurantId(id,(error, reviews) => {
     if(error){
-      console.log('there has been an error',error);
+      console.log('there has been an error while fething fetchReviewsByRestaurantId',error);
+
       DBHelper.fetchReviewsByRestaurantIdFromIDB(id,function (reviews) {
+
         fillReviewsHTML(reviews);
       });
     }else{
@@ -321,8 +323,11 @@ function postReview(data,callback) {
  
 }
 
+
+/**
+ * WIll hide the form + button, will add a success message + fill in the reviewmessage html for the created review
+ */
 function showPostResult(success,review) {
-  console.log('resuts',success);
   let reviewForm = document.getElementById('add-review-container');
   let reviewAdd = document.getElementById('review-add');
 
@@ -343,15 +348,11 @@ function showPostResult(success,review) {
 
   ul.appendChild(createReviewHTML(reviewObj));
 
-
   if(success){
-
     createdDiv.innerHTML = 'Review has been successfully posted';
 
   }else{
-
     createdDiv.innerHTML = 'Review will be posted upon reconnection';
-    
   }
   
   reviewAdd.appendChild(createdDiv);

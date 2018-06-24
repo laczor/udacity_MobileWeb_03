@@ -134,9 +134,10 @@ class DBHelper {
   //Get the object from the OjbectStore by it's id, it is important that the id keypath is a type of number, so we should search number types
         reviewsStore.getAll().then(function(data){
           let restaurantReviews = data.filter(function(review) {
-              return review.restaurant_id = id;
+            return review.restaurant_id == id;
           })
-          callback(null,restaurantReviews);
+          
+          callback(restaurantReviews);
       })
 
     });
