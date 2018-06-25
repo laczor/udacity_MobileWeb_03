@@ -1,7 +1,7 @@
 //THese scripts has to be in the root folder!!
 importScripts('idb.js');
 
-var SERVER_URL = 'http://localhost:1337';
+const SERVER_URL = 'http://localhost:1337';
 
 var dbPromise = idb.open('restaurant-db', 1, function (db) {
 });

@@ -25,7 +25,7 @@ window.initMap = function ()  {
       });
       fillBreadcrumb();
       DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
-      
+      eventListenerForFavoriteRestaurantCheckbox();
       // const iframe = document.querySelector('iframe'); iframe.title = "Google Maps"; 
     }
   });
@@ -469,3 +469,34 @@ function getParameterByName (name, url) {
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
 }
 
+function eventListenerForFavoriteRestaurantCheckbox() {
+
+  let checkbox = document.getElementById('favorite');
+
+  checkbox.addEventListener('keyup',function(event) {
+
+    if(event.keyCode == 13){
+      favoriteRestaurant(true,this);
+    }
+    
+  });
+  checkbox.addEventListener('click',function(event) {
+    
+    favoriteRestaurant(false,this);
+    
+  });
+  
+}
+function favoriteRestaurant(shouldChangeCheckedAttribute,checkbox) {
+
+  if(shouldChangeCheckedAttribute){
+    checkbox.checked = !checkbox.checked;
+
+  }
+  DBHelper.favoriteRestaurant(restaurant.id,checkbox.checked,function(msg) {
+      console.log(msg);
+      DBHelper.getfavoriteRestaurants();
+      
+  });
+
+}

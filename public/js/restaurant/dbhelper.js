@@ -313,4 +313,33 @@ class DBHelper {
     return marker;
   }
 
+  static favoriteRestaurant(id,value,callback){
+
+
+      fetch(DBHelper.DATABASE_URL+'/restaurants/'+id+'/?is_favorite='+value, {
+        method: 'PUT',
+      }).then(function(response) {
+        callback(response);
+        console.log(response);
+        // return response.json();
+      }).then(function(res) {
+        callback(res);
+      }).catch(function(error) {
+        callback(error);
+      });
+  
+  }
+
+  static getfavoriteRestaurants(){
+
+    fetch(DBHelper.DATABASE_URL+'/restaurants/?is_favorite=true').then(function(response) {
+      return response.json();
+    }).then(function(res) {
+      console.log('favorite restaurants-->',res);
+    }).catch(function(error) {
+      console.log(error);
+    });
+
+  }
+
 }

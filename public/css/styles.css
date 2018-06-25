@@ -309,7 +309,7 @@ nav h1 a {
   font-weight: 300;
   letter-spacing: 10px;
   margin: 10px auto;
-  padding: 2px 0;
+  padding: 10px 15px;
   text-align: center;
   text-transform: uppercase;
   width: 50%;
@@ -603,6 +603,72 @@ padding: 10px;
   }
 
 }
+
+
+/* Add Favourite checkbox animation */
+
+#favorite-label{
+  display: none;
+}
+#favorite{
+  -webkit-transform: translate3D(-50%, -50%, 0);
+          transform: translate3D(-50%, -50%, 0);
+          margin: 30px 30px 30px 40px;
+}
+#favorite:before, #favorite:after {
+  content: "";
+  cursor: pointer;
+  background-image: url(http://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Heart_coraz%C3%B3n.svg/2000px-Heart_coraz%C3%B3n.svg.png);
+  background-size: cover;
+  height: 50px;
+  width: 50px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate3D(-50%, -50%, 0);
+          transform: translate3D(-50%, -50%, 0);
+  -webkit-filter: grayscale(100%);
+          filter: grayscale(100%);
+}
+#favorite:after {
+  opacity: 0;
+  -webkit-filter: grayscale(0%);
+          filter: grayscale(0%);
+}
+#favorite:checked:before {
+  -webkit-filter: grayscale(0%);
+          filter: grayscale(0%);
+}
+#favorite:checked:after {
+  -webkit-animation: ascend ease-in-out 800ms;
+          animation: ascend ease-in-out 800ms;
+}
+
+@-webkit-keyframes ascend {
+  0% {
+    -webkit-transform: translate3D(-50%, -50%, 0);
+            transform: translate3D(-50%, -50%, 0);
+    opacity: 1;
+  }
+  100% {
+    -webkit-transform: translate3D(-50%, -200%, 0);
+            transform: translate3D(-50%, -200%, 0);
+    opacity: 0;
+  }
+}
+@keyframes ascend {
+  0% {
+    -webkit-transform: translate3D(-50%, -50%, 0);
+            transform: translate3D(-50%, -50%, 0);
+    opacity: 1;
+  }
+  100% {
+    -webkit-transform: translate3D(-50%, -200%, 0);
+            transform: translate3D(-50%, -200%, 0);
+    opacity: 0;
+  }
+}
+
 
 
 @media screen and (max-width: 1000px) {

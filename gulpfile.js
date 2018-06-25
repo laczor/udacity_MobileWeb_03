@@ -56,6 +56,9 @@ gulp.task("copyImgsDesktop", function () {
       .pipe(gulp.dest("dist/img"));
   });
 
+
+//Used to generate small images
+
 //   gulp.task("fav1", function () {
 //     gulp.src("public/img/favicon/*.{jpg,png}")
 //       .pipe(imageResize({ width : 57, height:57}))
@@ -129,5 +132,12 @@ gulp.task("copyImgsMobile", function () {
       .pipe(gulp.dest("dist/img"));
   });
 
-gulp.task('default', ['copyCss','js_info','js_main','copyImgsDesktop','copyImgsMobile']);
+
+//This case does not require imageMagick
+gulp.task('default', ['copyCss','js_info','js_main']);
+
+//This one does require imageMagick.
+// gulp.task('default', ['copyCss','js_info','js_main','copyImgsDesktop','copyImgsMobile']);
+
+//Used at the first build, to generate the necessary images
 // gulp.task('default', ['copyCss','js_info','js_main','copyImgsDesktop','copyImgsMobile','fav1','fav2','fav3','fav4','fav5','fav6','fav7','fav8','fav9']);
