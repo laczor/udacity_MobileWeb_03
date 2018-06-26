@@ -313,11 +313,11 @@ class DBHelper {
     return marker;
   }
 
-  static favoriteRestaurant(id,value,callback){
+  static favoriteRestaurant(restaurant,value,callback){
 
-
-      fetch(DBHelper.DATABASE_URL+'/restaurants/'+id+'/?is_favorite='+value, {
+      fetch(DBHelper.DATABASE_URL+'/restaurants/'+restaurant.id+'/?is_favorite='+value, {
         method: 'PUT',
+        body:JSON.stringify(restaurant)
       }).then(function(response) {
         callback(response);
         console.log(response);
@@ -328,6 +328,17 @@ class DBHelper {
         callback(error);
       });
   
+  }
+  static favoriteRestaurantIDB(restaurant){
+
+      return dbPromise.then(function(db) {
+
+        var tx = db.transaction('restaurants', 'readwrite');
+        var restaurantsStore = tx.objectStore('restaurants');
+    //Get the object from the OjbectStore by it's id, it is important that the id keypath is a type of number, so we should search number types
+    restaurantsStore.put(restaurant)
+        return tx.complete;
+      })
   }
 
   static getfavoriteRestaurants(){

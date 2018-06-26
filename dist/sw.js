@@ -52,8 +52,7 @@ self.addEventListener('fetch', function(event) {
         event.respondWith(servePhoto(event.request));
       return;
     }
-// ------ Return restaurant.html in case of *restaurants* ----- 
-    if (requestUrl.pathname.includes('restaurants')) {
+    if (requestUrl.href.includes('restaurants') && !requestUrl.href.includes('is_favorite')) {
       console.log('intercepting restaurant id page');
       event.respondWith(
         caches.match('restaurant.html')

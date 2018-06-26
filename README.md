@@ -3,7 +3,7 @@
 
 #### Running the application
 
-1. Go to Project_03 folder
+1. In the project folder
     2. Run npm i
     3. run npm i gulp -g
     Note: In order to run gulp, you have to install imageMagick, for the image transformations

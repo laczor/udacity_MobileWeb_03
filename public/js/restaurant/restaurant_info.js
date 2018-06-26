@@ -391,7 +391,6 @@ function createBackgroundSyncTaskForReview(reviewObj){
  * Create review HTML and add it to the webpage.
  */
 function createReviewHTML (review){
-  console.log('creating review',review);
   const li = document.createElement('li');
   const header = document.createElement('div');
   header.className="review-header";
@@ -471,7 +470,9 @@ function getParameterByName (name, url) {
 
 function eventListenerForFavoriteRestaurantCheckbox() {
 
+  console.log('this is the restaurant',restaurant);
   let checkbox = document.getElementById('favorite');
+  checkbox.checked = restaurant.is_favorite;
 
   checkbox.addEventListener('keyup',function(event) {
 
@@ -493,9 +494,11 @@ function favoriteRestaurant(shouldChangeCheckedAttribute,checkbox) {
     checkbox.checked = !checkbox.checked;
 
   }
-  DBHelper.favoriteRestaurant(restaurant.id,checkbox.checked,function(msg) {
+  restaurant.is_favorite = !restaurant.is_favorite;
+  DBHelper.favoriteRestaurant(restaurant,checkbox.checked,function(msg) {
+    DBHelper.favoriteRestaurantIDB(restaurant);
       console.log(msg);
-      DBHelper.getfavoriteRestaurants();
+      // DBHelper.getfavoriteRestaurants();
       
   });
 
