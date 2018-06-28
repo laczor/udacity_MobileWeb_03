@@ -36,6 +36,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
   })
 
   fetchRestaurantReviews();
+  DBHelper.postNotSyncedReviews();
+
 
 });
 

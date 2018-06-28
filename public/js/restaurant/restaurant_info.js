@@ -1,7 +1,10 @@
 let restaurant;
 var map;
 
-window.onload = function () {}
+window.onload = function () {
+
+  DBHelper.postNotSyncedReviews();
+}
 
 let SAMPLE_REVIEW = {
       comments:  "Five star food, two star atmosphere. I would definitely get takeout from this place - but dont think I have the energy to deal with the hipster ridiculousness again. By the time we left the wait was two hours long.",
@@ -115,13 +118,20 @@ function fetchRestaurantReviews(){
 
   let reviews = DBHelper.fetchReviewsByRestaurantId(id,(error, reviews) => {
     if(error){
-      console.log('there has been an error while fething fetchReviewsByRestaurantId',error);
+      // console.log('there has been an error while fething fetchReviewsByRestaurantId',error);
 
       DBHelper.fetchReviewsByRestaurantIdFromIDB(id,function (reviews) {
 
-        fillReviewsHTML(reviews);
+        console.log('fetched reviews from "reviews"',reviews);
+        DBHelper.fetchReviewsByRestaurantIdFromIDBToBeSynced(reviews,id,function name(fullReviews) {
+          console.log('fetched reviews from "sync-reviews" as well',fullReviews)
+          fillReviewsHTML(fullReviews);
+        })
+
       });
     }else{
+      console.log('saving the reviews for offline',reviews);
+      DBHelper.saveMultipleReviewInIDB(reviews);
       fillReviewsHTML(reviews);
     }
   });
@@ -318,6 +328,7 @@ function postReview(data,callback) {
       callback(true,data);
     }).catch(function(error) {
       console.log('error has been occured',error);
+      DBHelper.saveReviewInIDB(data);
       callback(false,data);
     });
  
@@ -353,7 +364,7 @@ function showPostResult(success,review) {
 
   }else{
     createBackgroundSyncTaskForReview(reviewObj);
-    // DBHelper.storeReviewsForLaterSync(reviewObj);
+    // DBHelper.storeReviewForLaterSync(reviewObj);
     createdDiv.innerHTML = 'Review will be posted upon reconnection';
   }
   
@@ -371,17 +382,12 @@ function createBackgroundSyncTaskForReview(reviewObj){
           .then(function(sw) {
 
       //4.Store it in the indexedDB, returns a promise
-      DBHelper.storeReviewsForLaterSync(reviewObj)
+      DBHelper.storeReviewForLaterSync(reviewObj)
               .then(function() {
       //5.Register syncronization task in the service worker that it can 
                 console.log('review storedm ready to register a task');
                 return sw.sync.register('sync-new-review');
-              })
-      //6. Adding some user feedback that we saved this data
-              .then(function() {
-                  console.log('registered task');
-              })
-              .catch(function(err) {
+              }).catch(function(err) {
                 console.log(err);
               });
           });
@@ -470,7 +476,6 @@ function getParameterByName (name, url) {
 
 function eventListenerForFavoriteRestaurantCheckbox() {
 
-  console.log('this is the restaurant',restaurant);
   let checkbox = document.getElementById('favorite');
   checkbox.checked = restaurant.is_favorite;
 

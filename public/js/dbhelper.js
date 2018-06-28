@@ -41,37 +41,38 @@ class DBHelper {
    * Fetch all restaurants form network first than cache.
    */
   static fetchRestaurants(callback) {
-    fetch(DBHelper.DATABASE_URL+'/restaurants')
-    .then(function(response) {
-      return response.json();
-    })
-    .then(function(restaurants) {
-      //Storing objects recieved in the response seperately in the indexedDb
-        dbPromise.then(function(db) {
-              var tx = db.transaction('restaurants', 'readwrite');
-              var restaurantStore = tx.objectStore('restaurants');
+        fetch(DBHelper.DATABASE_URL+'/restaurants')
+          .then(function(response) {
+            return response.json();
+          })
+        .then(function(restaurants) {
+          //Storing objects recieved in the response seperately in the indexedDb
+                  dbPromise.then(function(db) {
+                  var tx = db.transaction('restaurants', 'readwrite');
+                  var restaurantStore = tx.objectStore('restaurants');
 
-              restaurants.map(function(el){
-                restaurantStore.put(el);
-              })
+                  restaurants.map(function(el){
+                    restaurantStore.put(el);
+                  })
 
-              return tx.complete;
-        })
-        callback(null,restaurants);
+                  return tx.complete;
+                })
+                  callback(null,restaurants);
 
-    }).catch(function(error) {
-      //Fetching data from indexedDB if there is no connection
-        dbPromise.then(function(db) {
-            var tx = db.transaction('restaurants', 'readwrite');
-            var restaurantStore = tx.objectStore('restaurants');
+              }).catch(function(error) {
+                //Fetching data from indexedDB if there is no connection
+                  dbPromise.then(function(db) {
+                      var tx = db.transaction('restaurants', 'readwrite');
+                      var restaurantStore = tx.objectStore('restaurants');
 
-            restaurantStore.getAll().then(function(data){
-                callback(null,data);
-            })
+                      restaurantStore.getAll().then(function(data){
+                          callback(null,data);
+                      })
 
-      });
-    });
-  }
+                });
+              });
+        }
+
 
 
   static fetchRestaurantReviews(){
@@ -82,16 +83,23 @@ class DBHelper {
     })
     .then(function(reviews) {
       //Storing objects recieved in the response seperately in the indexedDb
-        dbPromise.then(function(db) {
-              var tx = db.transaction('reviews', 'readwrite');
-              var reviewsStore = tx.objectStore('reviews');
+        
+      DBHelper.fetchReviewsFromIDB().then(function(reviewsIDB) {
+        
+        if (reviewsIDB.length == 0) {
 
-              reviews.map(function(el){
-                reviewsStore.put(el);
-              })
+          console.log('should post all of the reviews into idb',reviewsIDB);
+        
+          DBHelper.saveReviewsToIDB(reviews);
+          
+        } else {
 
-              return tx.complete;
-        })
+          console.log('should not post all of the reviews into idb');
+          
+        }
+
+      })
+
         // callback(null,reviews);
 
     }).catch(function(error) {
@@ -106,6 +114,36 @@ class DBHelper {
 
       // });
     });  
+  }
+
+  static fetchReviewsFromIDB(){
+      console.log('fething from idb');
+
+      return dbPromise.then(function(db) {
+
+      var tx = db.transaction('reviews', 'readwrite');
+      var reviewsStore = tx.objectStore('reviews');
+  //Get the object from the OjbectStore by it's id, it is important that the id keypath is a type of number, so we should search number types
+        return reviewsStore.getAll();
+
+    });
+
+  }
+
+  static saveReviewsToIDB(reviews){
+
+    dbPromise.then(function(db) {
+      var tx = db.transaction('reviews', 'readwrite');
+      var reviewsStore = tx.objectStore('reviews');
+
+      reviews.map(function(el){
+        reviewsStore.put(el);
+      })
+
+      return tx.complete;
+})
+
+
   }
 
   static fetchReviewsByRestaurantId(id,callback){
@@ -128,6 +166,7 @@ class DBHelper {
 
   }
 
+
   static fetchReviewsByRestaurantIdFromIDB(id,callback){
 
     dbPromise.then(function(db) {
@@ -144,18 +183,6 @@ class DBHelper {
 
     });
 
-  }
-
-  static storeReviewsForLaterSync(review){
-
-    dbPromise.then(function(db) {
-
-      var tx = db.transaction('sync-reviews', 'readwrite');
-      var reviewsStore = tx.objectStore('sync-reviews');
-  //Get the object from the OjbectStore by it's id, it is important that the id keypath is a type of number, so we should search number types
-      reviewsStore.put(review)
-      return tx.complete;
-    })
   }
 
   /**
@@ -310,5 +337,30 @@ class DBHelper {
     );
     return marker;
   }
+
+  static postNotSyncedReviews(){
+    DBHelper.readyReviewsToBeSynced('sync-reviews')
+    .then(function(data) {
+//5. We make a seperate Post requests to store all of the posts seperately on firebase.
+      for (var dt of data) {
+        fetch(DBHelper.DATABASE_URL+'/reviews/', {
+          method: 'POST',
+          body: JSON.stringify(dt)
+        })
+//6.Delete the sent post from indexDB, we do not have access to the DOM          
+          .then(function(res) {
+            console.log('Background snyc post worked',res);
+            DBHelper.deleteItemFromData(dt.id);
+          })
+//7.Catch any error during the fetch method
+          .catch(function(err) {
+            console.log('Error while sending data', err);
+          });
+      }
+
+    })
+
+  }
+
 
 }

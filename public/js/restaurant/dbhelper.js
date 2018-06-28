@@ -10,7 +10,7 @@ var dbPromise = window.idb.open('restaurant-db', 1, function (db) {
     db.createObjectStore('reviews',{keyPath: 'id'});
   }
   if (!db.objectStoreNames.contains('sync-reviews')) {
-    db.createObjectStore('sync-reviews',{keyPath: 'id'});
+    db.createObjectStore('sync-reviews',{keyPath: 'id', autoIncrement:true});
   }
 });
 
@@ -82,6 +82,7 @@ class DBHelper {
     })
     .then(function(reviews) {
       //Storing objects recieved in the response seperately in the indexedDb
+      console.log('should post all of the reviews into idb');
         dbPromise.then(function(db) {
               var tx = db.transaction('reviews', 'readwrite');
               var reviewsStore = tx.objectStore('reviews');
@@ -145,11 +146,41 @@ class DBHelper {
 
     });
   }
+  static fetchReviewsByRestaurantIdFromIDBToBeSynced(reviews,id,callback){
 
-  static storeReviewsForLaterSync(review){
+    dbPromise.then(function(db) {
 
-    console.log('storing review for later sync');
+      var tx = db.transaction('sync-reviews', 'readwrite');
+      var reviewsStore = tx.objectStore('sync-reviews');
+  //Get the object from the OjbectStore by it's id, it is important that the id keypath is a type of number, so we should search number types
+        reviewsStore.getAll().then(function(data){
+          let restaurantReviews = data.filter(function(review) {
+            return review.restaurant_id == id;
+          })
+          
+          callback( reviews.concat(restaurantReviews));
+      })
 
+    });
+  }
+
+  // static storeReviewForLaterSync(review){
+  //   review['id']=Date.now();
+  //   console.log('storing review for later sync',review);
+
+  //   return dbPromise.then(function(db) {
+
+  //     var tx = db.transaction('sync-reviews', 'readwrite');
+  //     var reviewsStore = tx.objectStore('sync-reviews');
+  // //Get the object from the OjbectStore by it's id, it is important that the id keypath is a type of number, so we should search number types
+  // console.log('this is the review to be saved',review);
+  //     reviewsStore.put(review)
+  //     return tx.complete;
+  //   })
+  // }
+
+
+  static storeReviewForLaterSync(review){
     return dbPromise.then(function(db) {
 
       var tx = db.transaction('sync-reviews', 'readwrite');
@@ -160,6 +191,17 @@ class DBHelper {
     })
   }
 
+  // static storeReviewForLaterSync(review){
+  //   review['id']=Date.now();
+  //   return dbPromise.then(function(db) {
+  //     var tx = db.transaction('sync-reviews', 'readwrite');
+  //     var restaurantStore = tx.objectStore('sync-reviews');
+
+  //       restaurantStore.put(review);
+
+  //     return tx.complete;
+  //     });
+  // }
   /**
    * Fetch a restaurant by its ID.
    */
@@ -352,5 +394,86 @@ class DBHelper {
     });
 
   }
+
+  static postNotSyncedReviews(){
+    DBHelper.readyReviewsToBeSynced('sync-reviews')
+    .then(function(data) {
+//5. We make a seperate Post requests to store all of the posts seperately on firebase.
+      for (var dt of data) {
+        fetch(DBHelper.DATABASE_URL+'/reviews/', {
+          method: 'POST',
+          body: JSON.stringify(dt)
+        })
+//6.Delete the sent post from indexDB, we do not have access to the DOM          
+          .then(function(res) {
+            console.log('Background snyc post worked',res);
+            DBHelper.deleteItemFromData(dt.id);
+          })
+//7.Catch any error during the fetch method
+          .catch(function(err) {
+            console.log('Error while sending data', err);
+          });
+      }
+
+    })
+
+  }
+
+  static readyReviewsToBeSynced(params) {
+    return dbPromise.then(function(db) {
+          
+      var tx = db.transaction('sync-reviews', 'readwrite');
+      var syncReviewsStore = tx.objectStore('sync-reviews');
+    //Get the object from the OjbectStore by it's id, it is important that the id keypath is a type of number, so we should search number types
+      return syncReviewsStore.getAll();
+    
+    });
+  }
+
+  static deleteItemFromData(id) {
+    return dbPromise
+      .then(function(db) {
+        var tx = db.transaction('sync-reviews', 'readwrite');
+        var store = tx.objectStore('sync-reviews');
+        store.delete(id);
+        return tx.complete;
+      })
+      .then(function() {
+        console.log('Item deleted!');
+      });
+  };
+
+  static saveReviewInIDB(review){
+    return dbPromise.then(function(db) {
+      var tx = db.transaction('reviews', 'readwrite');
+      var restaurantStore = tx.objectStore('reviews');
+
+        restaurantStore.put(review);
+
+
+      return tx.complete;
+      });
+  }
+  static saveMultipleReviewInIDB(reviews){
+
+    return dbPromise.then(function(db) {
+      var tx = db.transaction('reviews', 'readwrite');
+      var restaurantStore = tx.objectStore('reviews');
+
+        reviews.map(function (el) {
+
+          if(!el.id){
+            el['id']= Date.now();
+          }
+          restaurantStore.put(el);
+        })
+
+      return tx.complete;
+})
+
+
+  }
+
+
 
 }

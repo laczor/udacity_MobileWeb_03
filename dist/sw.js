@@ -52,7 +52,7 @@ self.addEventListener('fetch', function(event) {
         event.respondWith(servePhoto(event.request));
       return;
     }
-    if (requestUrl.href.includes('restaurants') && !requestUrl.href.includes('is_favorite')) {
+    if (requestUrl.href.includes('restaurants') && !requestUrl.href.includes('is_favorite')&& !requestUrl.href.includes('reviews')) {
       console.log('intercepting restaurant id page');
       event.respondWith(
         caches.match('restaurant.html')
@@ -90,6 +90,16 @@ self.addEventListener('sync', function(event) {
 //1.To identify our sync task specificly
   if (event.tag === 'sync-new-review') {
     console.log('[Service Worker] Syncing new Posts');
+
+    if (navigator.onLine) {
+      // handle online status
+      // re-try api calls
+      console.log('device is now online');
+    } else {
+      // handle offline status
+      console.log('device is now offline');
+    }
+
 //3. Wait until the following scripts will end    
     event.waitUntil(
 //4. Will fetch all of the stored data from the indexDB
@@ -98,6 +108,9 @@ self.addEventListener('sync', function(event) {
         .then(function(data) {
 //5. We make a seperate Post requests to store all of the posts seperately on firebase.
           for (var dt of data) {
+            if(data.id){
+              data.id='';
+            }
             fetch(SERVER_URL+'/reviews/', {
               method: 'POST',
               body: JSON.stringify(dt)
